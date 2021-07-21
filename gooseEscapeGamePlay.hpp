@@ -1,3 +1,7 @@
+/*
+gooseEscapeGamePlay.hpp
+Jaden Durnford and Dennis Li
+*/
 #ifndef GOOSE_ESCAPE_GAMEPLAY
 #define GOOSE_ESCAPE_GAMEPLAY
 #include "gooseEscapeUtil.hpp"
@@ -64,8 +68,8 @@ bool captured(Actor const & player, Actor const & monster);
 void movePlayer(int key, Actor & player, int gameBoard[20][70]);
 
 /*
-    What other functions do you need to make the game work?  What can you add
-    to the basic functionality to make it more fun to play?
+    Move the goose to a new location based on where the player is
 */
+void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70]);
 
 #endif

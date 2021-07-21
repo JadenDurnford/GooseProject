@@ -1,3 +1,7 @@
+/*
+gooseEscapeGamePlay.cpp
+Jaden Durnford and Dennis Li
+*/
 #include <iostream>
 #include <cmath>
 using namespace std;
@@ -103,11 +107,61 @@ void movePlayer(int key, Actor & player, int gameBoard[20][70])
         
     if (player.can_move(xMove, yMove) 
       && gameBoard[player.get_y() + yMove][player.get_x()+ xMove] != SHALL_NOT_PASS)
-        player.update_location(xMove, yMove);
+    {
+    	player.update_location(xMove, yMove);
+		}
 }
 
 /*
-    What other functions do you need to make the game work?  What can you add
-    to the basic functionality to make it more fun to play?
+    Move the goose to a new location based on its position relative to the player
+    
+    the function checks whether the goose is farther from the player in the x
+    direction or y direction to determine which way the goose should be moved.
+    If the goose was previously covering a wall or win character, it gets
+    replaced on the following move it makes.
 */
+void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70])
+{
+	int playerX = 0, playerY = 0, gooseX = 0, gooseY = 0, diffX = 0, diffY = 0, 
+			gooseMoveX = 0, gooseMoveY = 0;
+	playerX = player.get_x();
+	playerY = player.get_y();
+	gooseX = monster.get_x();
+	gooseY = monster.get_y();
+	
+	diffX = gooseX - playerX;
+	diffY = gooseY - playerY;
+	if (abs(diffX) > abs(diffY))
+	{
+		if (diffX > 0)
+		{
+			gooseMoveX = -1;
+		}
+		else if (diffX < 0)
+		{
+			gooseMoveX = 1;
+		}
+	}
+	else
+	{
+		if (diffY > 0)
+		{
+			gooseMoveY = -1;
+		}
+		else if (diffY < 0)
+		{
+			gooseMoveY = 1;
+		}
+	}
+
+	monster.update_location(gooseMoveX,gooseMoveY);
+	if (gameBoard[monster.get_y() - gooseMoveY][monster.get_x() - gooseMoveX] == SHALL_NOT_PASS)
+	{
+		terminal_put(monster.get_x() - gooseMoveX,monster.get_y() - gooseMoveY,'o');
+	}
+	else if (gameBoard[monster.get_y() - gooseMoveY][monster.get_x() - gooseMoveX] == WINNER)
+	{
+		terminal_put(monster.get_x() - gooseMoveX,monster.get_y() - gooseMoveY,'%');
+	}
+}
 

@@ -1,3 +1,7 @@
+/*
+gooseEscapeMain.cpp
+Jaden Durnford and Dennis Li
+*/
 #include <BearLibTerminal.h>
 #include <cmath>
 #include <ctime>
@@ -28,12 +32,12 @@ void readFile(int gameBoard[20][70])
 
 int main()
 {
-    // Set up for using rand() to generate random numbers (can be deleted if random numbers not used)
-    srand(time(NULL));
+  // Set up for using rand() to generate random numbers (can be deleted if random numbers not used)
+  srand(time(NULL));
     
 	//Set up the window.  Don't edit these two lines
-    terminal_open();
-  	terminal_set(SETUP_MESSAGE);
+  terminal_open();
+  terminal_set(SETUP_MESSAGE);
 
 /*
     The code below provides a skeleton of the game play.  You will need to 
@@ -42,7 +46,7 @@ int main()
     
     Call the functions that you have written in the game play file.
 */
-    // declare the game board "map"
+  // declare the game board "map"
 	int gameBoard[20][70] = {0};
 
 /*
@@ -54,31 +58,22 @@ int main()
     function as well?
 */
 	readFile(gameBoard);
-	
-//		for (int y = 0; y<20;y++)
-//	{
-//		for (int x = 0;x<70;x++)
-//		{
-//		cout << gameBoard[y][x];
-//	}
-//	cout << endl;
-//	}
 
-    // Call the function to print the game board
-    printBoard(gameBoard);
+  // Call the function to print the game board
+  printBoard(gameBoard);
 /*
     The player and goose are initialized to the same locations
     (10,10) and (70,20) each time, with health of 100.
     You likely want to change this somehow.
 */
-    // make the player
-	Actor player(PLAYER_CHAR, 10,10, 100, PLAYER_COLOUR);
+  // make the player
+	Actor player(PLAYER_CHAR, 20,2, 100, PLAYER_COLOUR);
 	
 	// make the goose
-	Actor monster(MONSTER_CHAR, 70,20, 100, GOOSE_COLOUR);
+	Actor monster(MONSTER_CHAR, 68,18, 100, GOOSE_COLOUR);
     
 	// Printing the instructions in the console window
-    out.writeLine("Escape the Goose! " + monster.get_location_string());
+  out.writeLine("Escape the Goose! " + monster.get_location_string());
 	out.writeLine("Use the arrow keys to move");
 	out.writeLine("If the goose catches you, you lose!");
 	out.writeLine("Be careful! Sometimes the goose can jump through walls!");
@@ -93,20 +88,26 @@ int main()
     key being pressed.
 */
     int keyEntered = TK_A;  // can be any valid value that is not ESCAPE or CLOSE
+    int moveCounter = 0;
     bool gameRunning = true;
     
     while(keyEntered != TK_ESCAPE && keyEntered != TK_CLOSE 
                     && !captured(player,monster) && gameRunning)
-	{
+		{
 	    // get player key press
 	    keyEntered = terminal_read();
 
         if (keyEntered != TK_ESCAPE && keyEntered != TK_CLOSE)
         {
-            // move the player, you can modify this function
+          // move the player, you can modify this function
     	    movePlayer(keyEntered,player,gameBoard);
 	    
-    	    // call the goose's chase function
+    	    // call the goose's chase function, with an 80% chance that the goose gets to move when the player makes a move
+    	    moveCounter = rand() % 100;
+    	    if (moveCounter < 19)
+    	    {
+    	    	moveGoose(player,monster,gameBoard);
+					}
     	    
     	    // call other functions to do stuff?
     	}
