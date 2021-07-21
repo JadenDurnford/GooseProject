@@ -51,7 +51,7 @@ const char GOOSE_COLOUR[] = "yellow";
 /*
 	Print the game world
 */
-// function header
+void printBoard(int gameBoard[20][70]);
 
 /*
     Do something when the goose captures the player
@@ -61,7 +61,7 @@ bool captured(Actor const & player, Actor const & monster);
 /*
     Move the player to a new location based on the user input
 */
-void movePlayer(int key, Actor & player, /* game board array and any other parameters */);
+void movePlayer(int key, Actor & player, int gameBoard[20][70]);
 
 /*
     What other functions do you need to make the game work?  What can you add

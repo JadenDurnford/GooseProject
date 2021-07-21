@@ -41,12 +41,24 @@ y direction
     terminal_refresh() once after all elements have been put. Note that empty
     spaces do not need to be drawn.
 */
-// function header
+void printBoard(int gameBoard[20][70])
 {
-    terminal_put(x_location_on_board,y_location_on_board,WIN_CHAR);
-
-	// after putting items on the game board, refresh the terminal to see the items
-	terminal_refresh();
+	for (int y_location_on_board = 0;y_location_on_board<20;y_location_on_board++)
+	{
+		for (int x_location_on_board = 0;x_location_on_board<70;x_location_on_board++)
+		{
+			if (gameBoard[y_location_on_board][x_location_on_board]!= 0)
+			{
+				if (gameBoard[y_location_on_board][x_location_on_board] == SHALL_NOT_PASS)
+			    	terminal_put(x_location_on_board,y_location_on_board,'o');
+			    else if (gameBoard[y_location_on_board][x_location_on_board] == WINNER)
+			    	terminal_put(x_location_on_board,y_location_on_board,'%');	
+							
+				// after putting items on the game board, refresh the terminal to see the items
+				terminal_refresh();
+			}
+		}
+	}
 }
 
 /*
@@ -77,7 +89,7 @@ bool captured(Actor const & player, Actor const & monster)
 
     Going further: You could decide to learn about switch statements
 */
-void movePlayer(int key, Actor & player, /* game board array and any other parameters */)
+void movePlayer(int key, Actor & player, int gameBoard[20][70])
 {
     int yMove = 0, xMove = 0;
     if (key == TK_UP)
@@ -90,7 +102,7 @@ void movePlayer(int key, Actor & player, /* game board array and any other param
         xMove = 1;
         
     if (player.can_move(xMove, yMove) 
-      && /* new location on game board */ != SHALL_NOT_PASS)
+      && gameBoard[player.get_y() + yMove][player.get_x()+ xMove] != SHALL_NOT_PASS)
         player.update_location(xMove, yMove);
 }
 

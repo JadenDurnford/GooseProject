@@ -7,9 +7,24 @@ using namespace std;
 #include "gooseEscapeActor.hpp"
 #include "gooseEscapeConsole.hpp"
 #include "gooseEscapeGamePlay.hpp"
+#include <iostream>
+#include <fstream>
 
 //set up the console.   Don't modify this line!
 Console out;
+
+void readFile(int gameBoard[20][70])
+{
+	ifstream fin("gameBoard.txt");
+	for (int y = 0; y<20;y++)
+	{
+		for (int x = 0;x<70;x++)
+			fin >> gameBoard[y][x];
+		cout << endl;
+	}
+	
+	fin.close();
+}
 
 int main()
 {
@@ -28,7 +43,7 @@ int main()
     Call the functions that you have written in the game play file.
 */
     // declare the game board "map"
-
+	int gameBoard[20][70] = {0};
 
 /*
     Initialize locations in the game board to have game features.  This
@@ -38,11 +53,19 @@ int main()
     it make sense to store this information in a file?  Should code be a
     function as well?
 */
-    /* game board map location */ = SHALL_NOT_PASS;
-    /* game board map location */ = WINNER;  	
-  	
-    // Call the function to print the game board
+	readFile(gameBoard);
+	
+//		for (int y = 0; y<20;y++)
+//	{
+//		for (int x = 0;x<70;x++)
+//		{
+//		cout << gameBoard[y][x];
+//	}
+//	cout << endl;
+//	}
 
+    // Call the function to print the game board
+    printBoard(gameBoard);
 /*
     The player and goose are initialized to the same locations
     (10,10) and (70,20) each time, with health of 100.
@@ -70,9 +93,10 @@ int main()
     key being pressed.
 */
     int keyEntered = TK_A;  // can be any valid value that is not ESCAPE or CLOSE
+    bool gameRunning = true;
     
     while(keyEntered != TK_ESCAPE && keyEntered != TK_CLOSE 
-                    && !captured(player,monster) && /* has not won yet */)
+                    && !captured(player,monster) && gameRunning)
 	{
 	    // get player key press
 	    keyEntered = terminal_read();
@@ -80,11 +104,15 @@ int main()
         if (keyEntered != TK_ESCAPE && keyEntered != TK_CLOSE)
         {
             // move the player, you can modify this function
-    	    movePlayer(keyEntered,player,/* game board array and maybe other parameters */);
+    	    movePlayer(keyEntered,player,gameBoard);
 	    
     	    // call the goose's chase function
     	    
     	    // call other functions to do stuff?
+    	}
+    
+    if (gameBoard[player.get_y()][player.get_x()] == WINNER)
+    	gameRunning = false;
   	}
 
     if (keyEntered != TK_CLOSE)
