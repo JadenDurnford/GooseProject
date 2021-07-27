@@ -55,7 +55,12 @@ const char PLAYER_COLOUR[] = "light sky";
 const char GOOSE_COLOUR[] = "yellow";
 
 /*
-	Print the game world
+		Add coins to game world
+*/
+void addCoins(int gameBoard[20][70]);
+
+/*
+		Print the game world
 */
 void printBoard(int gameBoard[20][70]);
 
@@ -63,6 +68,11 @@ void printBoard(int gameBoard[20][70]);
     Do something when the goose captures the player
 */
 bool captured(Actor const & player, Actor const & monster);
+
+/*
+		Update coins collected
+*/
+void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMove, int xMove);
 
 /*
     Move the player to a new location based on the user input

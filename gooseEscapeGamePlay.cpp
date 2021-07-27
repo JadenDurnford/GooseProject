@@ -37,15 +37,15 @@ y direction
 */
 	
 /*
-	Print the game world
+	Add coins to game world
 	
-    The purpose of this function is to update the console to reflect the
-    current state of the game board. It works by calling the terminal_put(...)
-    function once for each of the game board elements, and then calling
-    terminal_refresh() once after all elements have been put. Note that empty
-    spaces do not need to be drawn.
+		The purpose of this function is the randomly generate the positions of
+		where to place the coins on the gameboard, and only place a coin there if
+		it is an empty space. This function also places a tracker for how many coins
+		the player has collected.
 */
-void printBoard(int gameBoard[20][70])
+
+void addCoins(int gameBoard[20][70])
 {
 	int coinXPos = 0, coinYPos = 0;
 	char totalCoinsChar = '0' + NUMBCOINS;
@@ -72,6 +72,20 @@ void printBoard(int gameBoard[20][70])
 	terminal_put(73,1,'i');
 	terminal_put(74,1,'n');
 	terminal_put(75,1,'s');
+}
+
+/*
+	Print the game world
+	
+    The purpose of this function is to update the console to reflect the
+    current state of the game board. It works by calling the terminal_put(...)
+    function once for each of the game board elements, and then calling
+    terminal_refresh() once after all elements have been put. Note that empty
+    spaces do not need to be drawn.
+*/
+
+void printBoard(int gameBoard[20][70])
+{
 	for (int y_location_on_board = 0;y_location_on_board<20;y_location_on_board++)
 	{
 		for (int x_location_on_board = 0;x_location_on_board<70;x_location_on_board++)
@@ -109,6 +123,39 @@ bool captured(Actor const & player, Actor const & monster)
 }
 
 /*
+	Update the number of coins collected
+	
+		Increase the number of coins collected by one and inform the player of how
+		many more coins they must collect to be able to exit the level. In addition
+		the function will update the coin tracker in the top right of the screen and
+		replace the square that was a coin with an empty character.
+*/
+
+void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMove, int xMove)
+{
+	char coinCountChar = '0';
+	char totalCoinsChar = '0' + NUMBCOINS;
+	coinCount++;
+	coinCountChar += coinCount; 
+	terminal_put(71,0,coinCountChar);
+	string coin1 = "You have collected ";
+	string coin2 = " of ";
+	string coin3 = " coins, collect the rest to finish the level!";
+	string outputCoins = coin1 + coinCountChar + coin2 + totalCoinsChar + coin3;
+	if (coinCount < NUMBCOINS)
+	{
+		out.writeLine(outputCoins);
+	}
+	else
+	{
+		out.writeLine("You have collected all the coins, get to the exit to win the level!");
+	}
+	
+	gameBoard[player.get_y() + yMove][player.get_x() + xMove] = EMPTY;
+	terminal_put(player.get_x() + xMove, player.get_y() + yMove, ' ');
+}
+
+/*
     Move the player to a new location based on the user input
     
     All key presses start with "TK_" then the character.  So "TK_A" is the A
@@ -120,11 +167,11 @@ bool captured(Actor const & player, Actor const & monster)
 
     Going further: You could decide to learn about switch statements
 */
+
 void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount)
 {
 	  int yMove = 0, xMove = 0;
-	  char coinCountChar = '0';
-	  char totalCoinsChar = '0' + NUMBCOINS;
+	  
 	  if (key == TK_UP)
 	      yMove = -1;
 	  else if (key == TK_DOWN)
@@ -139,24 +186,7 @@ void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount)
 	  {
 	  	if (gameBoard[player.get_y() + yMove][player.get_x()+ xMove] == COIN)
 	  	{
-	  		coinCount++;
-	  		coinCountChar += coinCount; 
-	  		terminal_put(71,0,coinCountChar);
-				string coin1 = "You have collected ";
-	  		string coin2 = " of ";
-	  		string coin3 = " coins, collect the rest to finish the level!";
-	  		string outputCoins = coin1 + coinCountChar + coin2 + totalCoinsChar + coin3;
-	  		if (coinCount < NUMBCOINS)
-	  		{
-	  			out.writeLine(outputCoins);
-				}
-				else
-				{
-					out.writeLine("You have collected all the coins, get to the exit to win the level!");
-				}
-	  		
-	  		gameBoard[player.get_y() + yMove][player.get_x() + xMove] = EMPTY;
-	  		terminal_put(player.get_x() + xMove, player.get_y() + yMove, ' ');
+				coinUpdate(gameBoard, player, coinCount, yMove, xMove);
 			}
 	  	player.update_location(xMove, yMove);
 	  	if (gameBoard[player.get_y() - yMove][player.get_x() - xMove] == WINNER)
@@ -174,6 +204,7 @@ void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount)
     If the goose was previously covering a wall or win character, it gets
     replaced on the following move it makes.
 */
+
 void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70])
 {
 	int playerX = 0, playerY = 0, gooseX = 0, gooseY = 0, diffX = 0, diffY = 0, 

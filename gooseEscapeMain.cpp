@@ -14,7 +14,7 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 
-//set up the console.   Don't modify this line!
+//set up the console. Don't modify this line!
 Console out;
 
 void readFile(int gameBoard[20][70])
@@ -48,12 +48,15 @@ int main()
 */
   // declare the game board "map"
 	int gameBoard[20][70] = {0};
-
+	
+	// tracks number of coins collected by the player
 	int coinCount = 0;
 	
+	// determines the difficulty level set by the user
 	int difficultyInput = TK_0;
 	int difficultyArray[4] = {60, 40, 20, 0};
 	int difficultyChosen = 0;
+	
 /*
     Initialize locations in the game board to have game features.  This
     would include anything that is static and doesn't move like a wall.  Hard
@@ -64,6 +67,9 @@ int main()
 */
 	readFile(gameBoard);
 
+	// Call the function to add coins to the game board
+	addCoins(gameBoard);
+	
   // Call the function to print the game board
   printBoard(gameBoard);
 /*
@@ -85,13 +91,19 @@ int main()
 	out.writeLine("You must collect all coins before finishing the level!");
 	out.writeLine("What difficulty would you like to play?");
 	out.writeLine("(easy = 1, medium = 2, hard = 3, impossible = 4):");
+	
+	// Accept input for a difficulty level from the player
 	difficultyInput = terminal_read();
+	
+	// Asks for an input of a difficulty level until the player enters a valid selection
 	while (difficultyInput != TK_1 && difficultyInput != TK_2 && difficultyInput != TK_3 && difficultyInput != TK_4)
 	{
 		out.writeLine("Please enter a valid difficulty setting.");
 		out.writeLine("easy = 1, medium = 2, hard = 3, impossible = 4):");
 		difficultyInput = terminal_read();
 	}
+	
+	// Sets the difficulty level based on what was chosen by the user
 	if (difficultyInput == TK_1)
 	{
 		difficultyChosen = difficultyArray[0];
@@ -139,16 +151,17 @@ int main()
         // move the player, you can modify this function
   	    movePlayer(keyEntered,player,gameBoard,coinCount);
     
-  	    // call the goose's chase function, with an 80% chance that the goose gets to move when the player makes a move
+  	    /* 
+					call the goose's chase function, with a varying chance depending on
+					difficulty, that the goose gets to move when the player makes a move
+				*/
   	    moveCounter = rand() % 100 + 1;
   	    if (moveCounter > difficultyChosen)
   	    {
   	    	moveGoose(player,monster,gameBoard);
 				}
-  	    
-  	    // call other functions to do stuff?
     	}
-    
+    	// If the player is on the winner square and has the required number of coins track that they have won
 	    if (gameBoard[player.get_y()][player.get_x()] == WINNER && coinCount == NUMBCOINS)
 	    {
 	    	gameRunning = false;
@@ -158,7 +171,7 @@ int main()
 
     if (keyEntered != TK_CLOSE)
     {
-      	//once we're out of the loop, the game is over
+      	// Inform the user that the game has ended and if they won or lost
       	if (winner)
         {
         	out.writeLine("Game has ended, you have defeated the goose!");
