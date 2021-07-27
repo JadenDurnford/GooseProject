@@ -18,11 +18,12 @@ Jaden Durnford and Dennis Li
     Declare constants to indicate various game world features in the board
     array.  Modify them to fit what you would like to do in the game.
 */
-
+const int NUMBCOINS = 3;
 // Going further:  Learn how to use an enum for these values
 const int EMPTY = 0;
 const int SHALL_NOT_PASS = 1;
 const int WINNER = 2;
+const int COIN = 3;
 
 /*
     A few examples of characters both for actors and for the game board itself
@@ -33,6 +34,7 @@ const int PLAYER_CHAR = int('@');
 const int MONSTER_CHAR = int('G');
 const int WALL_CHAR = int('o');
 const int WIN_CHAR = int('%'); //% sign, a special character used in the ancient game "Rogue"
+const int COIN_CHAR = int('$');
 
 /*
 Colours have the format "brightness hue" or "hue", e.g. "white" "light green"
@@ -65,7 +67,7 @@ bool captured(Actor const & player, Actor const & monster);
 /*
     Move the player to a new location based on the user input
 */
-void movePlayer(int key, Actor & player, int gameBoard[20][70]);
+void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount);
 
 /*
     Move the goose to a new location based on where the player is

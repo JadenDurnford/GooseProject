@@ -1,7 +1,7 @@
 /*
   STUDENTS: Don't modify this code unless you are comfortable with C++ classes.
     If you want to modify the size of the console, change the constants in the
-    gooseEscaoeUtil.hpp file.
+    gooseEscapeUtil.hpp file.
 */
   
 #include <iostream>

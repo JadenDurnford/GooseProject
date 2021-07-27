@@ -47,6 +47,31 @@ y direction
 */
 void printBoard(int gameBoard[20][70])
 {
+	int coinXPos = 0, coinYPos = 0;
+	char totalCoinsChar = '0' + NUMBCOINS;
+	
+	for (int index = 0; index < NUMBCOINS; index++)
+	{
+		coinXPos = rand() % 68 + 1;
+		coinYPos = rand() % 18 + 1;
+		
+		if (gameBoard[coinYPos][coinXPos] == EMPTY)
+		{
+			gameBoard[coinYPos][coinXPos] = COIN;
+		}
+		else
+		{
+			index--;
+		}
+	}
+	terminal_put(71,0,'0');
+	terminal_put(72,0,'/');
+	terminal_put(73,0,totalCoinsChar);
+	terminal_put(71,1,'c');
+	terminal_put(72,1,'o');
+	terminal_put(73,1,'i');
+	terminal_put(74,1,'n');
+	terminal_put(75,1,'s');
 	for (int y_location_on_board = 0;y_location_on_board<20;y_location_on_board++)
 	{
 		for (int x_location_on_board = 0;x_location_on_board<70;x_location_on_board++)
@@ -55,9 +80,11 @@ void printBoard(int gameBoard[20][70])
 			{
 				if (gameBoard[y_location_on_board][x_location_on_board] == SHALL_NOT_PASS)
 			    	terminal_put(x_location_on_board,y_location_on_board,'o');
-			    else if (gameBoard[y_location_on_board][x_location_on_board] == WINNER)
-			    	terminal_put(x_location_on_board,y_location_on_board,'%');	
-							
+			  else if (gameBoard[y_location_on_board][x_location_on_board] == WINNER)
+			    	terminal_put(x_location_on_board,y_location_on_board,'%');
+				else if (gameBoard[y_location_on_board][x_location_on_board] == COIN)
+						terminal_put(x_location_on_board,y_location_on_board,'$');
+				
 				// after putting items on the game board, refresh the terminal to see the items
 				terminal_refresh();
 			}
@@ -93,22 +120,49 @@ bool captured(Actor const & player, Actor const & monster)
 
     Going further: You could decide to learn about switch statements
 */
-void movePlayer(int key, Actor & player, int gameBoard[20][70])
+void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount)
 {
-    int yMove = 0, xMove = 0;
-    if (key == TK_UP)
-        yMove = -1;
-    else if (key == TK_DOWN)
-        yMove = 1;
-    else if (key == TK_LEFT)
-        xMove = -1;
-    else if (key == TK_RIGHT)
-        xMove = 1;
-        
-    if (player.can_move(xMove, yMove) 
-      && gameBoard[player.get_y() + yMove][player.get_x()+ xMove] != SHALL_NOT_PASS)
-    {
-    	player.update_location(xMove, yMove);
+	  int yMove = 0, xMove = 0;
+	  char coinCountChar = '0';
+	  char totalCoinsChar = '0' + NUMBCOINS;
+	  if (key == TK_UP)
+	      yMove = -1;
+	  else if (key == TK_DOWN)
+	      yMove = 1;
+	  else if (key == TK_LEFT)
+	      xMove = -1;
+	  else if (key == TK_RIGHT)
+	      xMove = 1;
+	      
+	  if (player.can_move(xMove, yMove) 
+	    && gameBoard[player.get_y() + yMove][player.get_x()+ xMove] != SHALL_NOT_PASS)
+	  {
+	  	if (gameBoard[player.get_y() + yMove][player.get_x()+ xMove] == COIN)
+	  	{
+	  		coinCount++;
+	  		coinCountChar += coinCount; 
+	  		terminal_put(71,0,coinCountChar);
+				string coin1 = "You have collected ";
+	  		string coin2 = " of ";
+	  		string coin3 = " coins, collect the rest to finish the level!";
+	  		string outputCoins = coin1 + coinCountChar + coin2 + totalCoinsChar + coin3;
+	  		if (coinCount < NUMBCOINS)
+	  		{
+	  			out.writeLine(outputCoins);
+				}
+				else
+				{
+					out.writeLine("You have collected all the coins, get to the exit to win the level!");
+				}
+	  		
+	  		gameBoard[player.get_y() + yMove][player.get_x() + xMove] = EMPTY;
+	  		terminal_put(player.get_x() + xMove, player.get_y() + yMove, ' ');
+			}
+	  	player.update_location(xMove, yMove);
+	  	if (gameBoard[player.get_y() - yMove][player.get_x() - xMove] == WINNER)
+			{
+				terminal_put(player.get_x() - xMove, player.get_y() - yMove, '%');
+			}
 		}
 }
 
@@ -163,5 +217,8 @@ void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70])
 	{
 		terminal_put(monster.get_x() - gooseMoveX,monster.get_y() - gooseMoveY,'%');
 	}
+	else if (gameBoard[monster.get_y() - gooseMoveY][monster.get_x() - gooseMoveX] == COIN)
+	{
+		terminal_put(monster.get_x() - gooseMoveX,monster.get_y() - gooseMoveY,'$');
+	}
 }
-
