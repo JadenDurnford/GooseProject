@@ -19,7 +19,7 @@ y direction
 // Screen layout
 const int NUM_SCREEN_X = 80;
 const int NUM_SCREEN_Y = 30;
-const char SETUP_MESSAGE[] = "window: title='Escape the Goose', size=80x30";  // size needs to match NUM_SCREEN_X and NUM_SCREEN_Y
+const char SETUP_MESSAGE[] = "window: title='Drill Boy', size=80x30";  // size needs to match NUM_SCREEN_X and NUM_SCREEN_Y
 const int MIN_SCREEN_X = 0;
 const int MIN_SCREEN_Y = 0;
 const int MAX_SCREEN_X = NUM_SCREEN_X - 1;

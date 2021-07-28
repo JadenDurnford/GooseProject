@@ -47,7 +47,9 @@ int main()
     Call the functions that you have written in the game play file.
 */
   // declare the game board "map"
-	int gameBoard[20][70] = {0};
+  	const int yTotal = 20;
+  	const int xTotal = 70;
+	int gameBoard[yTotal][xTotal] = {0};
 	
 	// tracks number of coins collected by the player
 	int coinCount = 0;
@@ -78,10 +80,11 @@ int main()
     You likely want to change this somehow.
 */
   // make the player
-	Actor player(PLAYER_CHAR, 20,2, 100, PLAYER_COLOUR);
-	
+	Actor player(PLAYER_CHAR, 2,2, 100, PLAYER_COLOUR);
+	player.update_invulnerableCount(0);
+	player.update_speedBoostCount(0);	
 	// make the goose
-	Actor monster(MONSTER_CHAR, 68,18, 100, GOOSE_COLOUR);
+	Actor monster(MONSTER_CHAR, 67,2, 100, GOOSE_COLOUR);
     
 	// Printing the instructions in the console window
   out.writeLine("Escape the Goose! " + monster.get_location_string());
@@ -140,7 +143,8 @@ int main()
     bool gameRunning = true;
     bool winner = false;
     
-    while(keyEntered != TK_ESCAPE && keyEntered != TK_CLOSE 
+    while(keyEntered != TK_ESCAPE
+	 && keyEntered != TK_CLOSE 
                     && !captured(player,monster) && gameRunning)
 		{
 	    // get player key press
@@ -155,6 +159,7 @@ int main()
 					call the goose's chase function, with a varying chance depending on
 					difficulty, that the goose gets to move when the player makes a move
 				*/
+		const int HUNDRED = 100;
   	    moveCounter = rand() % 100 + 1;
   	    if (moveCounter > difficultyChosen)
   	    {
@@ -167,6 +172,7 @@ int main()
 	    	gameRunning = false;
 	    	winner = true;   	
 			}
+			
   	}
 
     if (keyEntered != TK_CLOSE)

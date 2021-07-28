@@ -45,7 +45,7 @@ y direction
 		the player has collected.
 */
 
-void addCoins(int gameBoard[20][70])
+void addCoins(int gameBoard[yTotal][xTotal])
 {
 	int coinXPos = 0, coinYPos = 0;
 	char totalCoinsChar = '0' + NUMBCOINS;
@@ -84,22 +84,28 @@ void addCoins(int gameBoard[20][70])
     spaces do not need to be drawn.
 */
 
-void printBoard(int gameBoard[20][70])
+void printBoard(int gameBoard[yTotal][xTotal])
 {
-	for (int y_location_on_board = 0;y_location_on_board<20;y_location_on_board++)
+	for (int y_location_on_board = 0;y_location_on_board<yTotal;y_location_on_board++)
 	{
-		for (int x_location_on_board = 0;x_location_on_board<70;x_location_on_board++)
+		for (int x_location_on_board = 0;x_location_on_board<xTotal;x_location_on_board++)
 		{
 			if (gameBoard[y_location_on_board][x_location_on_board]!= 0)
 			{
 				if (gameBoard[y_location_on_board][x_location_on_board] == SHALL_NOT_PASS)
 			    	terminal_put(x_location_on_board,y_location_on_board,'o');
-			  else if (gameBoard[y_location_on_board][x_location_on_board] == WINNER)
+			  	else if (gameBoard[y_location_on_board][x_location_on_board] == WINNER)
 			    	terminal_put(x_location_on_board,y_location_on_board,'%');
 				else if (gameBoard[y_location_on_board][x_location_on_board] == COIN)
-						terminal_put(x_location_on_board,y_location_on_board,'$');
-				
+					terminal_put(x_location_on_board,y_location_on_board,'$');
+				else if (gameBoard[y_location_on_board][x_location_on_board] == SPEED_BOOST)
+					terminal_put(x_location_on_board,y_location_on_board,'>');
+				else if (gameBoard[y_location_on_board][x_location_on_board] == INVULNERABLE)
+					terminal_put(x_location_on_board,y_location_on_board,'*');
 				// after putting items on the game board, refresh the terminal to see the items
+				
+				
+
 				terminal_refresh();
 			}
 		}
@@ -118,6 +124,9 @@ void printBoard(int gameBoard[20][70])
 
 bool captured(Actor const & player, Actor const & monster)
 {
+	if (player.get_invulnerableCount() > 0)
+	return false;
+	
     return (player.get_x() == monster.get_x() 
          && player.get_y() == monster.get_y());
 }
@@ -128,10 +137,11 @@ bool captured(Actor const & player, Actor const & monster)
 		Increase the number of coins collected by one and inform the player of how
 		many more coins they must collect to be able to exit the level. In addition
 		the function will update the coin tracker in the top right of the screen and
-		replace the square that was a coin with an empty character.
+		replace the square that was a coin with an empty character. Returns the amount
+		of coins as a pass-by reference.
 */
 
-void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMove, int xMove)
+void coinUpdate(int gameBoard[yTotal][xTotal], Actor & player, int & coinCount, int yMove, int xMove)
 {
 	char coinCountChar = '0';
 	char totalCoinsChar = '0' + NUMBCOINS;
@@ -155,6 +165,65 @@ void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMov
 	terminal_put(player.get_x() + xMove, player.get_y() + yMove, ' ');
 }
 
+
+/* 
+	Activates when the user hits a speedboost
+	
+	The colour is changed, and the player actor now has 10 turns 
+	that allow him to move 2 tiles at once, instead of 1.
+	Additionally, the user can now walk through 1 thick tile
+	walls.
+*/
+void speedBoostHit(int gameBoard[yTotal][xTotal], Actor & player, int yMove, int xMove)
+{
+	player.update_colour(SPEED_COLOUR);
+	player.update_speedBoostCount(10);
+	player.update_location(xMove, yMove);
+	
+	gameBoard[player.get_y() + yMove][player.get_x() + xMove] = EMPTY;
+	terminal_put(player.get_x() + xMove, player.get_y() + yMove, ' ');
+}
+
+/* 
+	Activates when the user hits an invulnerability
+	
+	The user gets all the benefits from a speedboost,
+	and additionally can not die from the goose for
+	10 turns
+*/
+void invulnerableHit(int gameBoard[yTotal][xTotal], Actor & player, int yMove, int xMove)
+{
+	player.update_colour(INVULNERABLE_COLOUR);
+	player.update_invulnerableCount(10);
+	player.update_speedBoostCount(10);
+	player.update_location(xMove, yMove);
+	
+	gameBoard[player.get_y() + yMove][player.get_x() + xMove] = EMPTY;
+	terminal_put(player.get_x() + xMove, player.get_y() + yMove, ' ');
+}
+
+/*
+	After every turn, it checks to see if the user
+	has power ups. If so, the remaining turns with 
+	the power up is reduced by one. When they
+	have no more powerups, the player's colour is returned
+	to normal
+*/
+void powerUpUpdate(Actor & player)
+{
+		if (player.get_invulnerableCount()>0)
+	{
+		player.update_invulnerableCount(player.get_invulnerableCount()-1);
+		player.update_speedBoostCount(player.get_speedBoostCount()-1);
+	}
+	else if (player.get_speedBoostCount()>0)
+	{
+		player.update_speedBoostCount(player.get_speedBoostCount()-1);
+	}
+	if (player.get_speedBoostCount()==0 && player.get_invulnerableCount()==0)
+	player.update_colour(PLAYER_COLOUR);	
+}
+
 /*
     Move the player to a new location based on the user input
     
@@ -167,33 +236,54 @@ void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMov
 
     Going further: You could decide to learn about switch statements
 */
-
-void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount)
+void movePlayer(int key, Actor & player, int gameBoard[yTotal][xTotal], int & coinCount)
 {
-	  int yMove = 0, xMove = 0;
+	int yMove = 0, xMove = 0;
 	  
-	  if (key == TK_UP)
-	      yMove = -1;
-	  else if (key == TK_DOWN)
-	      yMove = 1;
-	  else if (key == TK_LEFT)
-	      xMove = -1;
-	  else if (key == TK_RIGHT)
-	      xMove = 1;
+	if (key == TK_UP)
+	    yMove = -1;
+	else if (key == TK_DOWN)
+	    yMove = 1;
+	else if (key == TK_LEFT)
+	    xMove = -1;
+	else if (key == TK_RIGHT)
+	    xMove = 1;
 	      
-	  if (player.can_move(xMove, yMove) 
-	    && gameBoard[player.get_y() + yMove][player.get_x()+ xMove] != SHALL_NOT_PASS)
-	  {
-	  	if (gameBoard[player.get_y() + yMove][player.get_x()+ xMove] == COIN)
-	  	{
+	int tileMoves = 1;
+	if (player.get_speedBoostCount()>0)
+		tileMoves = 2;
+		
+	for (int moves = 1; moves<=tileMoves; moves++)
+	{
+	
+		if (player.can_move(xMove*moves, yMove*moves) 
+		    && gameBoard[player.get_y() + yMove*moves][player.get_x()+ xMove*moves] != SHALL_NOT_PASS)
+		{
+		  	if (gameBoard[player.get_y() + yMove][player.get_x()+ xMove] == COIN)
+		  	{
 				coinUpdate(gameBoard, player, coinCount, yMove, xMove);
 			}
-	  	player.update_location(xMove, yMove);
-	  	if (gameBoard[player.get_y() - yMove][player.get_x() - xMove] == WINNER)
+		  	player.update_location(xMove, yMove);
+		  	
+		  	if (gameBoard[player.get_y() - yMove][player.get_x() - xMove] == WINNER)
 			{
 				terminal_put(player.get_x() - xMove, player.get_y() - yMove, '%');
 			}
+			
+			if (gameBoard[player.get_y() - yMove][player.get_x() - xMove] == SPEED_BOOST)
+			{	
+				speedBoostHit(gameBoard, player, yMove, xMove);
+			}
+			if (gameBoard[player.get_y() - yMove][player.get_x() - xMove] == INVULNERABLE)
+			{
+				invulnerableHit(gameBoard, player, yMove, xMove);
+			}
 		}
+		
+	}
+	
+	powerUpUpdate(player);
+
 }
 
 /*
@@ -204,8 +294,7 @@ void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount)
     If the goose was previously covering a wall or win character, it gets
     replaced on the following move it makes.
 */
-
-void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70])
+void moveGoose(Actor & player, Actor & monster, int gameBoard[yTotal][xTotal])
 {
 	int playerX = 0, playerY = 0, gooseX = 0, gooseY = 0, diffX = 0, diffY = 0, 
 			gooseMoveX = 0, gooseMoveY = 0;

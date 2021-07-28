@@ -18,13 +18,16 @@ Jaden Durnford and Dennis Li
     Declare constants to indicate various game world features in the board
     array.  Modify them to fit what you would like to do in the game.
 */
+const int yTotal = 20;
+const int xTotal = 70;
 const int NUMBCOINS = 3;
 // Going further:  Learn how to use an enum for these values
 const int EMPTY = 0;
 const int SHALL_NOT_PASS = 1;
 const int WINNER = 2;
 const int COIN = 3;
-
+const int SPEED_BOOST = 4;
+const int INVULNERABLE = 5;
 /*
     A few examples of characters both for actors and for the game board itself
     are shown.
@@ -35,6 +38,8 @@ const int MONSTER_CHAR = int('G');
 const int WALL_CHAR = int('o');
 const int WIN_CHAR = int('%'); //% sign, a special character used in the ancient game "Rogue"
 const int COIN_CHAR = int('$');
+const int SPEED_BOOST_CHAR = int('>');
+const int INVULNERABLE_CHAR = int('*');
 
 /*
 Colours have the format "brightness hue" or "hue", e.g. "white" "light green"
@@ -53,16 +58,17 @@ Hue may be specified in many ways, see http://foo.wyrd.name/en:bearlibterminal:r
 
 const char PLAYER_COLOUR[] = "light sky";
 const char GOOSE_COLOUR[] = "yellow";
-
+const char SPEED_COLOUR[] = "green";
+const char INVULNERABLE_COLOUR[] = "pink";
 /*
 		Add coins to game world
 */
-void addCoins(int gameBoard[20][70]);
+void addCoins(int gameBoard[yTotal][xTotal]);
 
 /*
 		Print the game world
 */
-void printBoard(int gameBoard[20][70]);
+void printBoard(int gameBoard[yTotal][xTotal]);
 
 /*
     Do something when the goose captures the player
@@ -72,16 +78,33 @@ bool captured(Actor const & player, Actor const & monster);
 /*
 		Update coins collected
 */
-void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMove, int xMove);
+void coinUpdate(int gameBoard[yTotal][xTotal], Actor & player, int & coinCount, int yMove, int xMove);
+
+
+/*
+	The user changes colour and moves 2 tiles at once
+*/
+void speedBoostHit(int gameBoard[yTotal][xTotal], Actor & player, int yMove, int xMove);
+
+
+/*
+	The user changes colour, moves 2 tiles at once, and can not die
+*/
+void invulnerableHit(int gameBoard[yTotal][xTotal], Actor & player, int yMove, int xMove);
+
+/*
+	Every turn, the remaining turns for the power ups are reduc
+*/
+void powerUpUpdate(Actor & player);
 
 /*
     Move the player to a new location based on the user input
 */
-void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount);
+void movePlayer(int key, Actor & player, int gameBoard[yTotal][xTotal], int & coinCount);
 
 /*
     Move the goose to a new location based on where the player is
 */
-void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70]);
+void moveGoose(Actor & player, Actor & monster, int gameBoard[yTotal][xTotal]);
 
 #endif

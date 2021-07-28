@@ -27,6 +27,29 @@ class Actor
   // get current x and y position formatted as a string so it can be output to the console
     string get_location_string() const;
     
+    // get the remaining turns with speed boost
+    int get_speedBoostCount() const
+    {
+    	return speedBoostCount;
+    }
+    // update the remaining amount of turns with speed boost. Value entered is the new amount.
+    void update_speedBoostCount(int newSpeedBoostCount)
+    {
+    	speedBoostCount = newSpeedBoostCount;
+    }
+ 
+    // get the remaining turns with invulnerability  
+    int get_invulnerableCount() const
+    {
+    	return invulnerableCount;
+    }
+    
+    // update the remaining amount of turns with invulnerability. Value entered is the new amount.
+    void update_invulnerableCount(int newInvulnerableCount)
+    {
+    	invulnerableCount = newInvulnerableCount;
+    }
+    
   // set a new character that will be used for showing the actor, will display after next move
     void change_char(char new_actor_char);
     
@@ -57,5 +80,7 @@ class Actor
     int location_x, location_y;  // location on the game board
     int health;  // current health
     color_t actorColour;
+    int speedBoostCount;
+    int invulnerableCount;
 };
 #endif
