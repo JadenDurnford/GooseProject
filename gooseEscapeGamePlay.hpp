@@ -1,3 +1,7 @@
+/*
+gooseEscapeGamePlay.hpp
+Jaden Durnford and Dennis Li
+*/
 #ifndef GOOSE_ESCAPE_GAMEPLAY
 #define GOOSE_ESCAPE_GAMEPLAY
 #include "gooseEscapeUtil.hpp"
@@ -14,11 +18,12 @@
     Declare constants to indicate various game world features in the board
     array.  Modify them to fit what you would like to do in the game.
 */
-
+const int NUMBCOINS = 3;
 // Going further:  Learn how to use an enum for these values
 const int EMPTY = 0;
 const int SHALL_NOT_PASS = 1;
 const int WINNER = 2;
+const int COIN = 3;
 
 /*
     A few examples of characters both for actors and for the game board itself
@@ -29,6 +34,7 @@ const int PLAYER_CHAR = int('@');
 const int MONSTER_CHAR = int('G');
 const int WALL_CHAR = int('o');
 const int WIN_CHAR = int('%'); //% sign, a special character used in the ancient game "Rogue"
+const int COIN_CHAR = int('$');
 
 /*
 Colours have the format "brightness hue" or "hue", e.g. "white" "light green"
@@ -49,7 +55,12 @@ const char PLAYER_COLOUR[] = "light sky";
 const char GOOSE_COLOUR[] = "yellow";
 
 /*
-	Print the game world
+		Add coins to game world
+*/
+void addCoins(int gameBoard[20][70]);
+
+/*
+		Print the game world
 */
 void printBoard(int gameBoard[20][70]);
 
@@ -59,13 +70,18 @@ void printBoard(int gameBoard[20][70]);
 bool captured(Actor const & player, Actor const & monster);
 
 /*
-    Move the player to a new location based on the user input
+		Update coins collected
 */
-void movePlayer(int key, Actor & player, int gameBoard[20][70]);
+void coinUpdate(int gameBoard[20][70], Actor & player, int & coinCount, int yMove, int xMove);
 
 /*
-    What other functions do you need to make the game work?  What can you add
-    to the basic functionality to make it more fun to play?
+    Move the player to a new location based on the user input
 */
+void movePlayer(int key, Actor & player, int gameBoard[20][70], int & coinCount);
+
+/*
+    Move the goose to a new location based on where the player is
+*/
+void moveGoose(Actor & player, Actor & monster, int gameBoard[20][70]);
 
 #endif
